@@ -1,0 +1,17 @@
+{
+  "name": "chatbot-integration",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tailwind.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "npx tailwindcss -i ./static/css/tailwind.css -o ./static/css/output.css --minify",
+    "watch:css": "npx tailwindcss -i ./static/css/tailwind.css -o ./static/css/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tailwindcss": "^3.4.4"
+  }
+}
