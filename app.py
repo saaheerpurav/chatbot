@@ -13,6 +13,7 @@ from llama_index.legacy import (
     load_index_from_storage,
 )
 
+#pipenv install -r requirements.txt
 # from llama_index.legacy.evaluation import FaithfulnessEvaluator
 from llama_index.legacy.llms.openai import OpenAI
 
