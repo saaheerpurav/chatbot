@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot</title>
-    <link href="{{ url_for('send_css', path='output.css') }}" rel="stylesheet">
+    <link href="{{ url_for('send_css') }}" rel="stylesheet">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
         <div class="border-b pl-5 pr-4 pt-2 pb-1 flex justify-between items-center">
             <div class="flex flex-row items-center">
                 <img class="rounded-full w-7 h-7 mr-3 drop-shadow-2xl"
-                    src="http://localhost:3000/_next/image?url=%2Fpfp.jpg&w=384&q=95" />
+                    src="https://www.saaheerpurav.com/_next/image?url=%2Fpfp.jpg&w=256&q=95" />
                 <h3 class="font-[600] text-lg bot-title"></h3>
             </div>
 
@@ -102,6 +102,7 @@
             for (let i of document.getElementsByClassName("bot-title")) i.textContent = e.bot_name;
             addBotMsg(`Hi! I'm ${e.bot_name}, ask me anything!`);
             messageInput.disabled = false;
+            messageInput.focus();
             initLoader.remove();
         })
 
@@ -137,6 +138,7 @@
                 document.getElementById("loader").remove();
                 addBotMsg(botMessage);
                 messageInput.disabled = false;
+                messageInput.focus();
                 scrollToBottom();
             }
         }
