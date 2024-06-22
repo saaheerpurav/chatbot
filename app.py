@@ -3,7 +3,7 @@ import os
 import json
 import s3fs
 from waitress import serve
-from paste.translogger import TransLogger
+#from paste.translogger import TransLogger
 
 from llama_index.legacy import (
     VectorStoreIndex,
@@ -135,5 +135,5 @@ if __name__ == "__main__":
         app.run(debug=True)
 
     elif app.config["ENV"] == "prod":
-        #serve(app, host="0.0.0.0", port=8080)
-        serve(TransLogger(app, setup_console_handler=False), host="0.0.0.0", port=8080)
+        serve(app, host="0.0.0.0", port=8080)
+        #serve(TransLogger(app, setup_console_handler=False), host="0.0.0.0", port=8080)
