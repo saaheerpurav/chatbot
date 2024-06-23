@@ -1,5 +1,5 @@
 flask==2.0.2
 waitress==2.1.2
 llama-index==0.10.45
-s3fs==2024.6.0
 python-dotenv==0.19.2
+pinecone-client==4.1.1
