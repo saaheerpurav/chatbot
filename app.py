@@ -15,8 +15,6 @@ from llama_index.legacy import (
     VectorStoreIndex,
     SimpleDirectoryReader,
     StorageContext,
-    ServiceContext,
-    load_index_from_storage,
 )
 from llama_index.legacy.vector_stores.pinecone import PineconeVectorStore
 from pinecone import Pinecone, ServerlessSpec
@@ -27,7 +25,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 
 # ============ SET dev OR prod ============
-app.config["ENV"] = "dev"
+app.config["ENV"] = "prod"
 # =========================================
 
 pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
@@ -88,9 +86,6 @@ def chatbot():
     data = request.json
     user_message = data.get("message")
     response = query_engine.query(user_message)
-
-    # eval_result = evaluator.evaluate_response(response=response)
-    # print(eval_result)
 
     return jsonify({"response": str(response)})
 
