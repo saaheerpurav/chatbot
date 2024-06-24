@@ -3,4 +3,4 @@ Werkzeug==3.0.3
 waitress==3.0.0
 llama-index==0.10.45
 python-dotenv==1.0.1
-pinecone-client==4.1.1
+s3fs==2024.6.0

@@ -25,5 +25,5 @@ CMD [ "python", "./app.py" ]
 # docker run -p 8080:8080 --env-file ./.env chatbot-container
 # docker system prune
 
-# docker tag chatbot-container us-west3-docker.pkg.dev/durable-height-427320-e6/chatbot-container/chatbot-container
-# docker push us-west3-docker.pkg.dev/durable-height-427320-e6/chatbot-container/chatbot-container
+# docker tag chatbot-container us-west3-docker.pkg.dev/durable-height-427320-e6/chatbot-container-repo/chatbot-container
+# docker push us-west3-docker.pkg.dev/durable-height-427320-e6/chatbot-container-repo/chatbot-container

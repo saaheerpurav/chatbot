@@ -18,7 +18,6 @@ from llama_index.core import (
     StorageContext,
     load_index_from_storage,
 )
-from llama_index.llms.openai import OpenAI
 
 cli.load_dotenv()
 
@@ -26,7 +25,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY")
 
 # ============ SET dev OR prod ============
-app.config["ENV"] = "dev"
+app.config["ENV"] = "prod"
 # =========================================
 
 s3 = s3fs.S3FileSystem(
