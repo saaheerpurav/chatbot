@@ -9,62 +9,72 @@ from flask import (
 )
 import os
 from waitress import serve
+import s3fs
+import json
 
-# from paste.translogger import TransLogger
-from llama_index.legacy import (
+from llama_index.core import (
     VectorStoreIndex,
     SimpleDirectoryReader,
     StorageContext,
+    load_index_from_storage,
 )
-from llama_index.legacy.vector_stores.pinecone import PineconeVectorStore
-from pinecone import Pinecone, ServerlessSpec
+from llama_index.llms.openai import OpenAI
 
 cli.load_dotenv()
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY")
 
 # ============ SET dev OR prod ============
-app.config["ENV"] = "prod"
+app.config["ENV"] = "dev"
 # =========================================
 
-pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
+s3 = s3fs.S3FileSystem(
+    key=os.environ.get("AWS_KEY"),
+    secret=os.environ.get("AWS_SECRET"),
+    s3_additional_kwargs={"ACL": "public-read"},
+)
+
 query_engine = None
 
 
 def initBot(bot_id):
-    bot_name = "Saaheer Purav"
-    idx_list = list(pc.list_indexes().__dict__["index_list"]["indexes"])
-    exists = False
+    PERSIST_DIR = "saaheer-chatbot-db/indexes/" + bot_id
+    DATA_DIR = "saaheer-chatbot-db/client_data/" + bot_id
 
-    for i in idx_list:
-        if bot_id in i.__dict__["_data_store"].values():
-            exists = True
-    
-    if exists is True:
-        print("EXISTS")
-        pinecone_index = pc.Index(bot_id)
-        vector_store = PineconeVectorStore(pinecone_index=pinecone_index)
-        index = VectorStoreIndex.from_vector_store(vector_store)
-    
-    else:
+    if not s3.exists(PERSIST_DIR):
+        # NEW
         print("NEW")
-        pc.create_index(
-            name=bot_id,
-            dimension=1536,
-            metric="euclidean",
-            spec=ServerlessSpec(cloud="aws", region="us-east-1"),
-        )
-        pinecone_index = pc.Index(bot_id)
-        vector_store = PineconeVectorStore(pinecone_index=pinecone_index)
-        storage_context = StorageContext.from_defaults(vector_store=vector_store)
-        documents = SimpleDirectoryReader("client_data/" + bot_id).load_data()
-        index = VectorStoreIndex.from_documents(documents, storage_context=storage_context)
+
+        bot_name = "Saaheer Purav"
+        documents = SimpleDirectoryReader(
+            input_dir="saaheer-chatbot-db/client_data/" + bot_id, fs=s3
+        ).load_data()
+
+        index = VectorStoreIndex.from_documents(documents)
+        index.storage_context.persist(PERSIST_DIR, fs=s3)
+        session["bot_name"] = bot_name
+
+        with s3.open(DATA_DIR + "/config.json", "w") as f:
+            json.dump(
+                {
+                    "id": bot_id,
+                    "bot_name": bot_name,
+                },
+                f,
+            )
+    else:
+        # EXISTING
+        print("EXISTING")
+
+        storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR, fs=s3)
+        index = load_index_from_storage(storage_context)
+
+        with s3.open(DATA_DIR + "/config.json", "r") as f:
+            session["bot_name"] = json.load(f)["bot_name"]
 
     global query_engine
     query_engine = index.as_query_engine()
-    session["bot_name"] = bot_name
-
 
 
 @app.route("/init-llm", methods=["POST"])
@@ -90,7 +100,6 @@ def chatbot():
     return jsonify({"response": str(response)})
 
 
-
 @app.route("/static/css")
 def send_css():
     return send_from_directory("static" + os.sep + "css", "output.css")
@@ -102,4 +111,3 @@ if __name__ == "__main__":
 
     elif app.config["ENV"] == "prod":
         serve(app, host="0.0.0.0", port=8080)
-        # serve(TransLogger(app, setup_console_handler=False), host="0.0.0.0", port=8080)
