@@ -17,8 +17,7 @@
     <div class="flex flex-col h-[100vh] w-[100vw] rounded-xl border bg-white">
         <div class="border-b pl-5 pr-4 pt-2 pb-1 flex justify-between items-center">
             <div class="flex flex-row items-center">
-                <img class="rounded-full w-7 h-7 mr-3 drop-shadow-2xl"
-                    src="https://www.saaheerpurav.com/_next/image?url=%2Fpfp.jpg&w=256&q=95" />
+                <img id="header-pfp" class="rounded-full w-7 h-7 mr-3 drop-shadow-2xl" src="" />
                 <h3 class="font-[600] text-lg bot-title"></h3>
             </div>
 
@@ -33,7 +32,9 @@
             </div>
         </div>
 
-        <div id="init-loader" class="bg-white rounded-xl border w-[100vw] h-[100vh] absolute top-0 left-0 z-[999] flex justify-center items-center overflow-hidden"></div>
+        <div id="init-loader"
+            class="bg-white rounded-xl border w-[100vw] h-[100vh] absolute top-0 left-0 z-[999] flex justify-center items-center overflow-hidden">
+        </div>
 
         <div id="chatbox" class="bg-white my-4 overflow-y-auto h-[100%] m-4">
             <!-- Chat messages will appear here -->
@@ -60,6 +61,7 @@
         const sendButton = document.getElementById('send-button');
         const closeButton = document.getElementById('close-button');
         const initLoader = document.getElementById("init-loader");
+        const headerPfp = document.getElementById("header-pfp");
 
         const loader = `
             <div class="w-full gap-x-2 flex justify-center items-center">
@@ -96,11 +98,12 @@
 
         initLoader.innerHTML = loader;
 
-        fetch('/init-llm?id=c5d8f014', {
+        fetch(`/init-bot?id=${new URLSearchParams(window.location.search).get("id")}`, {
             method: "POST"
         }).then(e => e.json()).then(e => {
             for (let i of document.getElementsByClassName("bot-title")) i.textContent = e.bot_name;
             addBotMsg(`Hi! I'm ${e.bot_name}, ask me anything!`);
+            headerPfp.src = e.pic_url;
             messageInput.disabled = false;
             messageInput.focus();
             initLoader.remove();
@@ -130,7 +133,7 @@
                     },
                     body: JSON.stringify({
                         message: userMessage
-                    }) // replace with dynamic client_id
+                    })
                 });
                 let data = await response.json();
                 let botMessage = data.response;

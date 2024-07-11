@@ -21,9 +21,12 @@ COPY static/css ./static/css
 # Specify the command to run on container start
 CMD [ "python", "./app.py" ]
 
+
+
+# Ensure ENV is set to prod
+# docker system prune
 # docker build -t chatbot-container .
 # docker run -p 8080:8080 --env-file ./.env chatbot-container
-# docker system prune
 
 # docker tag chatbot-container us-west3-docker.pkg.dev/durable-height-427320-e6/chatbot-container-repo/chatbot-container
 # docker push us-west3-docker.pkg.dev/durable-height-427320-e6/chatbot-container-repo/chatbot-container
