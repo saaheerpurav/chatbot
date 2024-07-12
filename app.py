@@ -7,6 +7,7 @@ from flask import (
     send_from_directory,
     cli,
 )
+
 import os
 import json
 import s3fs
@@ -45,8 +46,6 @@ def init_bot_config(bot_id):
 
     if not s3.exists(PERSIST_DIR):
         # NEW
-        print("NEW")
-
         documents = SimpleDirectoryReader(
             input_dir=DATA_DIR + "/knowledge", fs=s3
         ).load_data()
@@ -56,14 +55,15 @@ def init_bot_config(bot_id):
     storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR, fs=s3)
     bot_cache[bot_id] = {"bot_id": bot_id, "storage_context": storage_context}
 
-    with s3.open(DATA_DIR + "/config.json", "r") as f:
+    with s3.open(DATA_DIR + "/config.json", "r", encoding='utf-8') as f:
         obj = json.load(f)
         session["bot_name"] = obj["bot_name"]
         session["pic_url"] = obj["pic_url"]
+        session["welcome_message"] = obj["welcome_message"]
 
 
-def get_bot_response(user_input):
-    bot_data = bot_cache[session["bot_id"]]
+def get_bot_response(bot_id, user_input):
+    bot_data = bot_cache[bot_id]
 
     storage_context = bot_data["storage_context"]
     index = load_index_from_storage(storage_context)
@@ -91,7 +91,7 @@ def init_bot():
     init_bot_config(bot_id)
 
     return jsonify(
-        {"status": 200, "bot_name": session["bot_name"], "pic_url": session["pic_url"]}
+        {"status": 200, "bot_name": session["bot_name"], "pic_url": session["pic_url"], "welcome_message": session["welcome_message"]}
     )
 
 
@@ -99,7 +99,8 @@ def init_bot():
 def bot():
     data = request.json
     user_input = data.get("message")
-    response = get_bot_response(user_input)
+    bot_id = data.get("botId")
+    response = get_bot_response(bot_id, user_input)
 
     return jsonify({"status": 200, "response": str(response)})
 

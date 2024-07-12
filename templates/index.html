@@ -97,12 +97,16 @@
         }
 
         initLoader.innerHTML = loader;
+        const botId = new URLSearchParams(window.location.search).get("id");
 
-        fetch(`/init-bot?id=${new URLSearchParams(window.location.search).get("id")}`, {
+        fetch(`/init-bot?id=${botId}`, {
             method: "POST"
         }).then(e => e.json()).then(e => {
+
             for (let i of document.getElementsByClassName("bot-title")) i.textContent = e.bot_name;
-            addBotMsg(`Hi! I'm ${e.bot_name}, ask me anything!`);
+
+            addBotMsg(e.welcome_message.replaceAll("\n", "<br><br>"));
+
             headerPfp.src = e.pic_url;
             messageInput.disabled = false;
             messageInput.focus();
@@ -132,7 +136,8 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: userMessage
+                        message: userMessage,
+                        botId: botId
                     })
                 });
                 let data = await response.json();
