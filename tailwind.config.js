@@ -1,12 +1,12 @@
 module.exports = {
   mode: 'jit',
   purge: [
-    './templates/**/*.html',
-    './static/**/*.js',
+    './app/templates/**/*.html',
+    './app/static/**/*.js',
   ],
   content: [
-    './templates/**/*.html',
-    './static/**/*.js',
+    './app/templates/**/*.html',
+    './app/static/**/*.js',
   ],
   theme: {
     extend: {},

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot</title>
-    <link href="{{ url_for('send_css') }}" rel="stylesheet">
+    <link href="{{ url_for('chatbot.send_css') }}" rel="stylesheet">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,6 +62,10 @@
         const closeButton = document.getElementById('close-button');
         const initLoader = document.getElementById("init-loader");
         const headerPfp = document.getElementById("header-pfp");
+        let emailMsgAdded = false;
+        let shouldCaptureEmail = false;
+
+
 
         const loader = `
             <div class="w-full gap-x-2 flex justify-center items-center">
@@ -71,6 +75,7 @@
             </div>
         `;
 
+
         const loaderMsg = `
             <div class="container flex justify-start" id="loader">
                 <div class="p-3 py-4 bg-gray-200 my-2 rounded-tl-xl rounded-tr-xl rounded-br-xl max-w-[90%]">
@@ -79,6 +84,31 @@
             </div>
         `;
 
+        const emailSubmitMsg = `
+            <div id="email-submit-message" class="container flex justify-start">
+                <div class="p-3 bg-gray-200 my-2 rounded-tl-xl rounded-tr-xl rounded-br-xl max-w-[90%]">
+                    <p>To provide you with the best assistance and keep you updated with any follow-ups, could you
+                        please share your email address?</p>
+
+                    <div class="bg-white rounded-md flex flex-row items-center mt-4">
+                        <input id="email-input" class="w-full outline-none px-2" type="text" autocomplete="off"
+                            placeholder="Type your email here...">
+
+                        <button id="email-send-button" class="m-2 bg-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="none" d="M0 0h24v24H0V0z"></path>
+                                <path fill="#0074f0" class="color000000 svgShape"
+                                    d="M3.4 20.4l17.45-7.48c.81-.35.81-1.49 0-1.84L3.4 3.6c-.66-.29-1.39.2-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `
+
+
+
         function scrollToBottom() {
             document.getElementById("chatbox").lastElementChild.scrollIntoView({
                 behavior: "smooth",
@@ -86,51 +116,43 @@
             });
         }
 
+
+        function convertToLinks(text) {
+            const emailPattern = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
+            const urlPattern = /(https?:\/\/[^\s]+)/g;
+            text = text.replace(emailPattern, '<a style="color: #0074f0" href="mailto:$1" target="_blank">$1</a>');
+            text = text.replace(urlPattern, '<a style="color: #0074f0" href="$1" target="_blank">$1</a>');
+            return text;
+        }
+
         function addBotMsg(m) {
-            chatbox.innerHTML += `
+            chatbox.insertAdjacentHTML('beforeend', `
                 <div class="container flex justify-start">
                     <div class="p-3 bg-gray-200 my-2 rounded-tl-xl rounded-tr-xl rounded-br-xl max-w-[90%]">
                         <p>${m}</p>
                     </div>
                 </div>
-            `;
+            `);
         }
-
-        initLoader.innerHTML = loader;
-        const botId = new URLSearchParams(window.location.search).get("id");
-
-        fetch(`/init-bot?id=${botId}`, {
-            method: "POST"
-        }).then(e => e.json()).then(e => {
-
-            for (let i of document.getElementsByClassName("bot-title")) i.textContent = e.bot_name;
-
-            addBotMsg(e.welcome_message.replaceAll("\n", "<br><br>"));
-
-            headerPfp.src = e.pic_url;
-            messageInput.disabled = false;
-            messageInput.focus();
-            initLoader.remove();
-        })
-
 
 
         async function submitMsg() {
             let userMessage = messageInput.value;
             if (userMessage.trim() !== "") {
-                chatbox.innerHTML += `
+                chatbox.insertAdjacentHTML('beforeend', `
                     <div class="container flex justify-end">
                         <div class="p-3 bg-[#0074f0] text-white my-2 rounded-tl-xl rounded-tr-xl rounded-bl-xl max-w-[90%] mr-2">
                             <p>${userMessage}</p>
                         </div>
                     </div>
-                `;
-                chatbox.innerHTML += loaderMsg;
+                `);
+                chatbox.insertAdjacentHTML('beforeend', loaderMsg);
+
                 messageInput.value = '';
                 messageInput.disabled = true;
                 scrollToBottom();
 
-                let response = await fetch('/chatbot', {
+                let response = await fetch('/chatbot/message', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -144,12 +166,102 @@
                 let botMessage = data.response;
 
                 document.getElementById("loader").remove();
-                addBotMsg(botMessage);
+                addBotMsg(convertToLinks(botMessage));
+
                 messageInput.disabled = false;
                 messageInput.focus();
                 scrollToBottom();
+                
+                console.log(shouldCaptureEmail);
+                if (emailMsgAdded === false && shouldCaptureEmail == true) {
+                    addEmailMsg();
+                    emailMsgAdded = true;
+                }
             }
         }
+
+
+        function validateEmail(email) {
+            var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+
+        function addEmailMsg() {
+            chatbox.insertAdjacentHTML('beforeend', emailSubmitMsg);
+
+            scrollToBottom();
+
+            setTimeout(() => {
+                document.getElementById("email-send-button").addEventListener('click', submitEmail);
+
+                let emailInput = document.getElementById("email-input");
+                emailInput.focus();
+                emailInput.addEventListener("keyup", (event) => {
+                    if (event.key === "Enter") submitEmail();
+                })
+            }, 500);
+        }
+
+
+        async function submitEmail() {
+            let userEmail = document.getElementById('email-input').value;
+            if (userEmail.trim() !== "") {
+                if (validateEmail(userEmail)) {
+                    document.getElementById("email-submit-message").remove();
+                    chatbox.insertAdjacentHTML('beforeend', loaderMsg);
+
+                    let response = await fetch('/chatbot/email-submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: userEmail,
+                            botId: botId
+                        })
+                    });
+                    let data = await response.json();
+                    document.getElementById("loader").remove();
+
+                    if (data.status === 200) {
+                        addBotMsg("Thank you for providing your email! We'll be in touch soon.")
+                    } else {
+                        document.getElementById("email-submit-message").remove();
+                        addBotMsg("Invalid email. Please enter a valid email address.")
+                        addEmailMsg();
+                    }
+                    scrollToBottom();
+
+                } else {
+                    document.getElementById("email-submit-message").remove();
+                    addBotMsg("Invalid email. Please enter a valid email address.")
+                    addEmailMsg();
+                }
+            }
+        }
+
+
+
+        initLoader.insertAdjacentHTML('beforeend', loader);
+        const botId = new URLSearchParams(window.location.search).get("id");
+
+        fetch(`/chatbot/init-bot?id=${botId}`, {
+            method: "POST"
+        }).then(e => e.json()).then(e => {
+
+            for (let i of document.getElementsByClassName("bot-title")) i.textContent = e.bot_name;
+
+            addBotMsg(e.welcome_message.replaceAll("\n", "<br><br>"));
+            shouldCaptureEmail = e.email_capture;
+
+            headerPfp.src = e.pic_url;
+            messageInput.disabled = false;
+            messageInput.focus();
+            initLoader.remove();
+        })
+
+
 
         closeButton.addEventListener('click', () => {
             parent.postMessage("iframe_close", '*');

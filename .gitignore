@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 
+/app/__pycache__
+
 /client_data/
 
 # testing

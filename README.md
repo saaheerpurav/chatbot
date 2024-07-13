@@ -29,18 +29,22 @@ This is a Flask web application that uses LlamaIndex. Returns a chat window to b
     FLASK_SECRET_KEY=...
     AWS_KEY=...
     AWS_SECRET=...
+    DATABASE_URL=...
     ```
 
 ## Usage
 
-1. **Set environment**:
-    Set `app.config["ENV"]` to be `dev` or `prod`
-
-2. **Run the flask application**:
+1. **Run the flask application (dev)**:
     ```
-    python app.py
+    flask run --debug
     ```
     The application will be available at `http://127.0.0.1:5000`
+
+2. **Run the flask application (production)**:
+    ```
+    waitress-serve --call app:create_app
+    ```
+    The application will be available at `http://0.0.0.0:8080`
 
 
 ## Deployment
