@@ -70,7 +70,7 @@
 
         chatbotContainer.innerHTML = `
             <div id="iframe-container">
-                <iframe id="iframe" src="${chatbotUrl}/chatbot-iframe?id=${botId}" onload="showBubble()"></iframe>
+                <iframe id="iframe" src="${chatbotUrl}/chatbot/iframe?id=${botId}" onload="showBubble()"></iframe>
             </div>
 
             <div id="button-container" style="position: fixed; right: 20px; bottom: 20px; z-index:99">

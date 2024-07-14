@@ -20,6 +20,11 @@ def iframe():
     return render_template("chatbot.html")
 
 
+@bp.route("/preview")
+def preview():
+    return render_template("preview.html")
+
+
 @bp.route("/chatbot/css")
 def send_css():
     return send_from_directory("static" + os.sep + "css", "output.css")
