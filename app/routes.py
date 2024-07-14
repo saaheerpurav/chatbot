@@ -25,21 +25,18 @@ def send_css():
     return send_from_directory("static" + os.sep + "css", "output.css")
 
 
+@bp.route("/embed")
+def embed_chatbot():
+    return send_from_directory("static" + os.sep + "js", "embed.js")
+
+
 @bp.route("/chatbot/init-bot", methods=["POST"])
 def init_bot():
     bot_id = request.args.get("id")
     session["bot_id"] = bot_id
-    init_bot_config(bot_id)
+    bot_config_result = init_bot_config(bot_id)
 
-    return jsonify(
-        {
-            "status": 200,
-            "bot_name": session["bot_name"],
-            "pic_url": session["pic_url"],
-            "welcome_message": session["welcome_message"],
-            "email_capture": session["email_capture"],
-        }
-    )
+    return jsonify(bot_config_result), bot_config_result["status"]
 
 
 @bp.route("/chatbot/message", methods=["POST"])
@@ -66,6 +63,6 @@ def email_submit():
         db.session.commit()
 
         return jsonify({"status": 200})
-    
+
     else:
-        return jsonify({"status": 400})
+        return jsonify({"status": 400, "error": "INVALID_EMAIL"}), 400

@@ -19,29 +19,38 @@ s3 = s3fs.S3FileSystem(
 bot_cache = {}
 
 
-
 def init_bot_config(bot_id):
     DATA_DIR = "saaheer-chatbot-db/client_data/" + bot_id
     PERSIST_DIR = "saaheer-chatbot-db/indexes/" + bot_id
 
-    if not s3.exists(PERSIST_DIR):
-        # NEW
-        documents = SimpleDirectoryReader(
-            input_dir=DATA_DIR + "/knowledge", fs=s3
-        ).load_data()
-        index = VectorStoreIndex.from_documents(documents)
-        index.storage_context.persist(PERSIST_DIR, fs=s3)
+    if not s3.exists(DATA_DIR):
+        return {
+            "status": 400,
+            "error": "BOT_NOT_FOUND",
+        }
 
-    storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR, fs=s3)
-    bot_cache[bot_id] = {"bot_id": bot_id, "storage_context": storage_context}
+    else:
+        if not s3.exists(PERSIST_DIR):
+            # NEW
+            documents = SimpleDirectoryReader(
+                input_dir=DATA_DIR + "/knowledge", fs=s3
+            ).load_data()
+            index = VectorStoreIndex.from_documents(documents)
+            index.storage_context.persist(PERSIST_DIR, fs=s3)
 
-    with s3.open(DATA_DIR + "/config.json", "r", encoding="utf-8") as f:
-        obj = json.load(f)
-        session["bot_name"] = obj["bot_name"]
-        session["pic_url"] = obj["pic_url"]
-        session["welcome_message"] = obj["welcome_message"]
-        session["email_capture"] = obj["email_capture"]
+        storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR, fs=s3)
+        bot_cache[bot_id] = {"bot_id": bot_id, "storage_context": storage_context}
 
+        with s3.open(DATA_DIR + "/config.json", "r", encoding="utf-8") as f:
+            obj = json.load(f)
+
+            return {
+                "status": 200,
+                "bot_name": obj["bot_name"],
+                "pic_url": obj["pic_url"],
+                "welcome_message": obj["welcome_message"],
+                "email_capture": obj["email_capture"],
+            }
 
 
 def get_bot_response(bot_id, user_input):
@@ -54,7 +63,6 @@ def get_bot_response(bot_id, user_input):
     response = query_engine.query(user_input)
 
     return response
-
 
 
 def validate_email(email):

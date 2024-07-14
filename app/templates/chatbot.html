@@ -33,7 +33,7 @@
         </div>
 
         <div id="init-loader"
-            class="bg-white rounded-xl border w-[100vw] h-[100vh] absolute top-0 left-0 z-[999] flex justify-center items-center overflow-hidden">
+            class="bg-white rounded-xl border w-[100vw] h-[100vh] absolute top-0 left-0 z-[999] flex flex-col justify-center items-center overflow-hidden">
         </div>
 
         <div id="chatbox" class="bg-white my-4 overflow-y-auto h-[100%] m-4">
@@ -62,19 +62,18 @@
         const closeButton = document.getElementById('close-button');
         const initLoader = document.getElementById("init-loader");
         const headerPfp = document.getElementById("header-pfp");
+
         let emailMsgAdded = false;
         let shouldCaptureEmail = false;
 
 
-
         const loader = `
-            <div class="w-full gap-x-2 flex justify-center items-center">
+            <div class="w-full gap-x-2 flex justify-center items-center chatbot-loader">
                 <div class="w-3 h-3 bg-[#d991c2] animate-pulse rounded-full"></div>
                 <div class="w-3 h-3 animate-pulse bg-[#9869b8] rounded-full"></div>
                 <div class="w-3 h-3 animate-pulse bg-[#6756cc] rounded-full"></div>
             </div>
         `;
-
 
         const loaderMsg = `
             <div class="container flex justify-start" id="loader">
@@ -125,6 +124,7 @@
             return text;
         }
 
+
         function addBotMsg(m) {
             chatbox.insertAdjacentHTML('beforeend', `
                 <div class="container flex justify-start">
@@ -171,8 +171,7 @@
                 messageInput.disabled = false;
                 messageInput.focus();
                 scrollToBottom();
-                
-                console.log(shouldCaptureEmail);
+
                 if (emailMsgAdded === false && shouldCaptureEmail == true) {
                     addEmailMsg();
                     emailMsgAdded = true;
@@ -242,24 +241,44 @@
         }
 
 
+        function displayError(msg) {
+            document.getElementsByClassName("chatbot-loader")[0].remove();
+            initLoader.innerHTML = `
+                <p class="text-3xl font-bold text-red-500 mb-4">Error</p>
+                <p class="">${msg}</p>
+            `;
+        }
+
 
         initLoader.insertAdjacentHTML('beforeend', loader);
         const botId = new URLSearchParams(window.location.search).get("id");
 
         fetch(`/chatbot/init-bot?id=${botId}`, {
-            method: "POST"
-        }).then(e => e.json()).then(e => {
+                method: "POST"
+            })
+            .then(e => {
+                if (e.ok) return e.json();
+                return e.text().then(r => {
+                    throw new Error(r)
+                })
+            })
+            .then(e => {
 
-            for (let i of document.getElementsByClassName("bot-title")) i.textContent = e.bot_name;
+                for (let i of document.getElementsByClassName("bot-title")) i.textContent = e.bot_name;
 
-            addBotMsg(e.welcome_message.replaceAll("\n", "<br><br>"));
-            shouldCaptureEmail = e.email_capture;
+                addBotMsg(e.welcome_message.replaceAll("\n", "<br><br>"));
+                shouldCaptureEmail = e.email_capture;
 
-            headerPfp.src = e.pic_url;
-            messageInput.disabled = false;
-            messageInput.focus();
-            initLoader.remove();
-        })
+                headerPfp.src = e.pic_url;
+                messageInput.disabled = false;
+                messageInput.focus();
+                initLoader.remove();
+            })
+            .catch((e) => {
+                let errorCode = JSON.parse(e.message).error;
+                if (errorCode === "BOT_NOT_FOUND") displayError("Bot Not Found")
+                else displayError("Server Error")
+            })
 
 
 
