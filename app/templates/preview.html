@@ -14,28 +14,33 @@
             align-items: center;
             background-color: #9ebad3;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            overflow: hidden;
         }
 
         #iframe {
             border: none;
-            width: 20vw;
-            height: 70vh;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        @media (min-width: 720px) {
+            #iframe {
+                width: 20vw;
+                height: 70vh;
+            }
         }
     </style>
 </head>
 
 <body style="height: 100vh;">
     <div id="iframe-container" style="display: none;">
-        <iframe id="iframe" onload="showIframe()"></iframe>
+        <iframe id="iframe" class="" onload="showIframe()"></iframe>
     </div>
 </body>
 
 <script>
-    //const chatbotUrl = "http://127.0.0.1:5000"
-    const chatbotUrl = "https://chatbot.saaheerpurav.com"
-
     const botId = new URLSearchParams(window.location.search).get("bot-id");
-    document.getElementById("iframe").setAttribute("src", `${chatbotUrl}/chatbot/iframe?id=${botId}`);
+    document.getElementById("iframe").setAttribute("src", `/chatbot/iframe?id=${botId}`);
 
     window.showIframe = function () {
         document.getElementById("iframe-container").style.display = "block";

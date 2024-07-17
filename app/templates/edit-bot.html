@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Edit Chatbot</title>
+
+	<link rel="stylesheet" href="{{url_for('static',filename='css/output.css')}}" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+
+	<style>
+		.dropdown-menu {
+			display: none;
+		}
+
+		.form-save:disabled {
+			background-color: #003a77;
+		}
+
+		.form-delete:disabled {
+			background-color: #7e0000;
+		}
+	</style>
+</head>
+
+<body class="h-[100vh] bg-[#F4F7FF]">
+	<div class="py-14 lg:py-20 h-[100%]">
+		<h1 class="text-center mb-20 text-4xl font-bold text-[#0074f0]">
+			Edit Chatbot
+		</h1>
+
+		<div class="w-full px-4 flex flex-col items-center">
+			<div
+				class="w-[90%] mx-auto text-center bg-white rounded-lg relative mb-20 py-14 px-8 sm:px-12 md:px-[60px]">
+
+				<div id="dropdowns-container"></div>
+
+				<a class="bg-gray-200 text-black px-4 py-2 rounded active:bg-gray-300" href="/dashboard">Back</a>
+			</div>
+		</div>
+	</div>
+</body>
+
+<script>
+	function toggleDropdown(button) {
+		const dropdownMenu = button.nextElementSibling;
+		dropdownMenu.style.display =
+			dropdownMenu.style.display === "block" ? "none" : "block";
+	}
+
+	function selectOption(button, value, idx) {
+		document.getElementsByClassName("dropdown-text")[idx].textContent = value;
+		button
+			.closest(".relative")
+			.querySelector("button").nextElementSibling.style.display = "none";
+	}
+
+	// Close the dropdown if the user clicks outside of it
+	window.onclick = function (event) {
+		if (
+			!event.target.matches(".dropdown-menu") &&
+			!event.target.closest(".relative")
+		) {
+			const dropdowns = document.querySelectorAll(".dropdown-menu");
+			dropdowns.forEach((dropdown) => {
+				dropdown.style.display = "none";
+			});
+		}
+	};
+</script>
+
+<script>
+	let data = `{{ data | safe }}`.replaceAll("\\n", "<br>").replaceAll("\n", "<br>").replace(/\\'/g, "'");
+	data = [JSON.parse(data)];
+
+	let toUpload = [];
+	let totalFileNames = [];
+	let initFileNos;
+	let botId = window.location.pathname.split("/").pop();
+
+	function addFileElm(arr, isUpload) {
+		return arr.map((e, idx) => `
+			<div file-index="${totalFileNames.indexOf(e)}" class="hover:bg-gray-100 py-2 px-2 rounded flex flex-row justify-between items-center group h-10">
+				<p class="text-sm text-gray-600 text-left">${e}</p>
+
+				${
+					isUpload
+						? `
+							<button onclick="removeFile(${totalFileNames.indexOf(e)})" class="bg-red-500 active:bg-red-700 p-1 rounded hidden group-hover:block">
+								<svg fill="red" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width=2 viewBox="0 0 24 24" height="1em" width="1em">
+									<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+								</svg>
+							</button>
+						`
+					: ""
+				}
+
+			</div>
+		`).join("")
+	}
+
+	function addFile(event) {
+		let newFiles = Array.from(event.target.files);
+		toUpload = toUpload.concat(newFiles);
+		let fileInfo = document.getElementById("fileInfo");
+
+		let fileNamesTemp = [];
+		newFiles.forEach(f => {
+			fileNamesTemp.push(f.name);
+			totalFileNames.push(f.name);
+		});
+
+		fileInfo.insertAdjacentHTML("beforeend", addFileElm(fileNamesTemp, true));
+	}
+
+	function removeFile(idx) {
+		totalFileNames.splice(idx, 1);
+		let fileElm = document.querySelector(`[file-index="${idx}"]`);
+
+		toUpload = toUpload.filter((e) => {
+			return e.name !== fileElm.textContent.trim();
+		});
+
+		fileElm.remove();
+	}
+
+	function validateUrl(url) {
+		var pattern = new RegExp(
+			"^(https?:\\/\\/)?" + // protocol
+			"((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+			"((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+			"(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+			"(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+			"(\\#[-a-z\\d_]*)?$",
+			"i"
+		); // fragment locator
+		return !!pattern.test(url);
+	}
+
+	function formatDate(dateStr) {
+		let date = new Date(dateStr);
+		let day = date.getDate();
+		let month = date.toLocaleString("default", {
+			month: "long",
+		});
+		let year = date.getFullYear();
+
+		let hours = date.getHours().toString().padStart(2, "0");
+		let minutes = date.getMinutes().toString().padStart(2, "0");
+
+		let suffix = (day) => {
+			if (day > 3 && day < 21) return "th";
+			switch (day % 10) {
+				case 1:
+					return "st";
+				case 2:
+					return "nd";
+				case 3:
+					return "rd";
+				default:
+					return "th";
+			}
+		};
+
+		return `${day}${suffix(day)} ${month} ${year}, ${hours}:${minutes}`;
+	};
+
+	function downloadCSV(csv, filename) {
+		let csvFile = new Blob([csv], {
+			type: "text/csv",
+		});
+		let downloadLink = document.createElement("a");
+		downloadLink.download = filename;
+		downloadLink.href = window.URL.createObjectURL(csvFile);
+		downloadLink.style.display = "none";
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+	}
+
+	function exportTableToCSV(idx) {
+		let csv = [];
+		let rows = document.querySelectorAll(`tbody tr`);
+
+		for (let i = 0; i < rows.length; i++) {
+			let row = [];
+			let cols = rows[i].querySelectorAll("td");
+
+			for (let j = 0; j < cols.length; j++) row.push(cols[j].innerText);
+			csv.push(row.join(","));
+		}
+		downloadCSV(csv.join("\n"), "leads.csv");
+	}
+
+	function deleteBot(idx) {
+		let content = document.querySelector("#dropdowns-container");
+		content.querySelector(".form-delete").disabled = true;
+
+		let userConfirmed = confirm(
+			"Are you sure you want to delete this bot? All data will be deleted and this action cannot be undone."
+		);
+
+		if (userConfirmed)
+			fetch("/dashboard/delete-bot", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					id: botId,
+				}),
+			})
+			.then((e) => {
+				if (e.ok) return e.json();
+				return e.text().then((r) => {
+					throw new Error(r);
+				});
+			})
+			.then((e) => {
+				if (e.status === 200) window.location.href = "/dashboard";
+			})
+			.catch((e) => {
+				console.log(e);
+			});
+	}
+
+	function saveChanges(idx) {
+		let content = document.querySelector("#dropdowns-container");
+		let vals = content.querySelectorAll(".form-field");
+
+		content.querySelector(".form-save").disabled = true;
+
+		let botData = {
+			id: botId,
+		};
+
+		for (let elm of vals) {
+			let key = elm.querySelector(".form-key").getAttribute("label-key");
+			if (key !== "knowledge") {
+				let valElm = elm.querySelector(".form-value");
+				let valType = valElm.getAttribute("val-type");
+				let value;
+
+				if (["text", "textarea"].includes(valType)) value = valElm.value.replaceAll("\n\n", "\n");
+				else if (valType === "dropdown") value = valElm.querySelector(".dropdown-text").textContent.trim() ===
+					"Yes";
+
+				botData[key] = value;
+			}
+		}
+
+		let fileData = new FormData();
+		for (let file of toUpload) {
+			fileData.append('files[]', file, file.name);
+		}
+		fileData.append("bot_data", JSON.stringify(botData))
+
+
+		fetch("/dashboard/update-bot", {
+				method: "POST",
+				body: fileData,
+			})
+			.then((e) => {
+				if (e.ok) return e.json();
+				return e.text().then((r) => {
+					throw new Error(r);
+				});
+			})
+			.then((e) => {
+				if (e.status === 200) window.location.reload();
+			})
+			.catch((e) => {
+				console.log(e);
+			});
+	}
+
+	function rearrangeArray(arr) {
+		let elm = arr.findIndex((item) => item[0] === "knowledge");
+
+		if (elm !== -1) {
+			let itm = arr.splice(elm, 1)[0];
+			arr.push(itm);
+		}
+
+		return arr;
+	}
+
+	const container = document.getElementById("dropdowns-container");
+
+	const dropdownSvg = `
+      <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+          clip-rule="evenodd" />
+      </svg>
+    `;
+
+	function copyText(content) {
+		let toCopy = document.querySelector(`.${content}`).textContent;
+		navigator.clipboard.writeText(toCopy.toString());
+	}
+
+	function copyButton(content) {
+		return `
+			<button class="bg-gray-200 p-[1px] rounded active:bg-gray-300" onclick="copyText('${content}')">
+				<svg viewBox="0 0 21 21" fill="black" height="1.5em" width="1.5em">
+					<g fill="none" fillRule="evenodd" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+						<path d="M7.5 4.5c-.441 0-1.039-.004-1.998-.005a1 1 0 00-.995.881l-.007.12v10.997c0 .552.448 1 1 1l10 .006a1 1 0 00.994-.882l.006-.117v-11a1 1 0 00-1-1h-2" />
+						<path d="M8.5 3.5h4a1 1 0 110 2h-4a1 1 0 110-2zM6.5 8.5h5M6.5 10.5h7M6.5 12.5h3M6.5 14.5h6" />
+					</g>
+				</svg>
+			</button>
+		`
+	};
+
+	data.forEach((item, index) => {
+		// Dropdown
+
+		const dropdownContent = document.createElement("div");
+
+		// Bot Data
+		const botDataDiv = document.createElement("div");
+		botDataDiv.classList.add("mb-4");
+
+		for (const [key, value] of rearrangeArray(
+				Object.entries(item.bot_data)
+			)) {
+			if (key !== "id") {
+				let labelName;
+				let elmType = "text";
+
+				if (key === "bot_name") {
+					labelName = "Bot Name";
+				} else if (key === "email_capture") {
+					labelName = "Capture Email";
+					elmType = "dropdown";
+				} else if (key === "pic_url") {
+					labelName = "Avatar URL";
+				} else if (key === "welcome_message") {
+					labelName = "Welcome Message";
+					elmType = "textarea";
+				} else if (key === "knowledge") {
+					labelName = "Knowledge Documents";
+					elmType = "upload";
+				}
+
+				const dataRow = document.createElement("div");
+				dataRow.classList.add(
+					"mb-2",
+					"flex",
+					"flex-row",
+					"items-center",
+					"form-field"
+				);
+
+				const label = document.createElement("span");
+				label.setAttribute("label-key", key);
+				label.classList.add("w-[20%]", "text-start", "form-key");
+				label.textContent = labelName;
+				dataRow.appendChild(label);
+
+				if (elmType === "text") {
+					let input = document.createElement("input");
+					input.setAttribute("val-type", elmType);
+					input.classList.add(
+						"border",
+						"rounded",
+						"px-2",
+						"py-1",
+						"w-[100%]",
+						"form-value"
+					);
+					input.type = key === "pic_url" ? "url" : "text";
+					input.value = value;
+					dataRow.appendChild(input);
+				} else if (elmType === "textarea") {
+					let textarea = document.createElement("textarea");
+					textarea.setAttribute("val-type", elmType);
+					textarea.classList.add(
+						"border",
+						"rounded",
+						"px-2",
+						"py-1",
+						"w-[100%]",
+						"h-40",
+						"form-value"
+					);
+					textarea.type = "textarea";
+					textarea.value = value.replaceAll("<br>", "\n\n");
+					dataRow.appendChild(textarea);
+				} else if (elmType === "dropdown") {
+					let selectContainer = document.createElement("div");
+					selectContainer.setAttribute("val-type", elmType);
+					selectContainer.classList.add(
+						"w-[100%]",
+						"flex",
+						"justify-start",
+						"form-value"
+					);
+					selectContainer.innerHTML = `
+						<div class="relative inline-block w-[10rem]">
+							
+							<button class="w-full py-2 px-4 border rounded flex flex-row items-center justify-between" onclick="toggleDropdown(this)">
+							<p class="dropdown-text">${value ? "Yes" : "No"}</p>
+			
+							${dropdownSvg}
+							</button>
+			
+							<div class="dropdown-menu absolute left-0 mt-2 w-full bg-white border rounded shadow-lg z-10">
+							<ul class="py-1">
+								<li>
+								<button class="w-full text-left px-4 py-2 hover:bg-gray-100"
+									onclick="selectOption(this, 'Yes', ${index})">Yes</button>
+								</li>
+								<li>
+								<button class="w-full text-left px-4 py-2 hover:bg-gray-100"
+									onclick="selectOption(this, 'No', ${index})">No</button>
+								</li>
+							</ul>
+							</div>
+						</div>
+						`;
+					dataRow.appendChild(selectContainer);
+
+				} else if (elmType === "upload") {
+
+					initFileNos = value.length;
+					totalFileNames.push(...value);
+
+					let uploadContainer = document.createElement("div");
+					uploadContainer.setAttribute("val-type", elmType);
+					uploadContainer.classList.add("w-[100%]", "rounded", "form-value", "border");
+					uploadContainer.insertAdjacentHTML("beforeend", `
+						<label for="document"
+							class="flex justify-center text-center cursor-pointer bg-gray-200 active:bg-gray-300 rounded py-1">
+							Choose files
+						</label>
+
+						<input type="file" id="document" name="document" accept=".txt" multiple required class="hidden" onchange="addFile(event)">
+
+						<div id="fileInfo" class="mt-2 text-sm text-gray-600 text-left">
+							${addFileElm(value, false)}
+						</div>
+					`);
+					dataRow.appendChild(uploadContainer);
+				}
+
+				botDataDiv.appendChild(dataRow);
+			}
+		}
+
+		const shareContainer = document.createElement("div");
+		shareContainer.insertAdjacentHTML("beforeend", `
+			<div>
+				<p class="text-xl font-semibold mt-10 mb-2">Share</p>
+
+				<div class="mb-2 flex flex-row items-center form-field">
+					<span class="w-[20%] text-start form-key">Share URL</span>
+					<div class="border rounded px-2 py-1 w-[100%] flex flex-row justify-between items-center">
+						<a class="share-url text-[#0074f0] active:text-[#004fa3]" target="_blank" href="/preview?bot-id=${botId}">${window.location.host}/preview?bot-id=${botId}</a>
+						${copyButton("share-url")}
+					</div>
+				</div>
+
+				<div class="mb-2 flex flex-row items-center form-field">
+					<span class="w-[20%] text-start form-key">Embed URL</span>
+					<div class="border rounded px-2 py-1 w-[100%] flex flex-row justify-between items-center">
+						<p class="embed-url">&lt;script bot-id="${botId}" src="${window.location.host + "/embed"}"&gt;&lt;/script&gt;</p>
+						${copyButton("embed-url")}
+					</div>
+				</div>
+			</div>
+		`);
+
+		const leadsTable = document.createElement("table");
+
+		if (item.leads.length > 0) {
+			leadsTable.classList.add("min-w-full", "border", "rounded", "bg-white");
+
+			const leadsHeader = `
+				<thead>
+					<tr>
+						<th class="py-2 px-4 border">Email</th>
+						<th class="py-2 px-4 border">Created At</th>
+					</tr>
+				</thead>
+			`;
+
+			let leadsRows = "<tbody>";
+			item.leads.forEach((lead) => {
+				leadsRows += `
+					<tr>
+						<td class="py-2 px-4 border">${lead.email}</td>
+						<td class="py-2 px-4 border">${formatDate(lead.created_at)}</td>
+					</tr>
+				`;
+			});
+			leadsRows += "</tbody>";
+			leadsTable.innerHTML = leadsHeader + leadsRows;
+		}
+
+		dropdownContent.appendChild(botDataDiv);
+		dropdownContent.insertAdjacentHTML("beforeend", `
+			<div class="w-full mt-4 flex justify-end">
+			<div>
+				<button class="bg-[#ff0000] text-white px-4 py-2 rounded active:bg-[#a00000] mr-2 form-delete" onclick="deleteBot(${index})">Delete Bot</button>
+				<button class="bg-[#0074f0] text-white px-4 py-2 rounded active:bg-[#004fa3] form-save" onclick="saveChanges(${index})">Save Changes</button>
+			</div>
+			</div>
+		`);
+
+		dropdownContent.appendChild(shareContainer);
+
+		if (item.leads.length > 0 || item.bot_data.email_capture === true) {
+			dropdownContent.insertAdjacentHTML(
+				"beforeend",
+				`<p class="text-xl font-semibold mt-10 mb-2">Leads</p>`
+			);
+			if (item.leads.length === 0)
+				dropdownContent.insertAdjacentHTML(
+					"beforeend",
+					`<p class="my-2">No leads yet</p>`
+				);
+			else {
+				dropdownContent.appendChild(leadsTable);
+				dropdownContent.insertAdjacentHTML("beforeend", `
+					<div class="w-full mt-4 flex justify-end">
+						<button class="bg-[#0074f0] text-white px-4 py-2 rounded active:bg-[#004fa3]" onclick="exportTableToCSV(${index})">Download as CSV</button>
+					</div>
+				`);
+			}
+		}
+
+		container.appendChild(dropdownContent);
+	});
+</script>
+
+</html>

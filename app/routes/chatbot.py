@@ -6,10 +6,12 @@ from flask import (
     send_from_directory,
     Blueprint,
 )
+
 import os
-from .utils import get_bot_response, init_bot_config, validate_email
-from . import db
-from .models import Leads
+from ..utils import get_bot_response, init_bot_config, validate_email
+from .. import db
+from ..models import Leads
+
 
 bp = Blueprint("chatbot", __name__)
 
