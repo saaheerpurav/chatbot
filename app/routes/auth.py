@@ -13,11 +13,31 @@ from ..utils import (
     delete_bot_data,
     fetch_bot_config,
     check_bot_exists,
-    clear_bot_cache
+    clear_bot_cache,
+    send_email
 )
 
 
 bp = Blueprint("auth", __name__)
+
+
+
+
+@bp.route("/", methods=["GET"])
+def home():
+    return render_template("home.html")
+
+
+@bp.route("/contact", methods=["POST"])
+def contact():
+    form_data = request.form.to_dict()
+    response = send_email(form_data)
+
+    if response:
+        return jsonify({"status": 200})
+    else:
+        return jsonify({"status": 400, "error": "EMAIL_ERROR"}), 400
+    
 
 
 @bp.route("/signup", methods=["GET", "POST"])
@@ -147,7 +167,7 @@ def update_bot():
             return jsonify({"status": 400, "error": "UNSUPPORTED_FILE_TYPE"}), 400
 
         upload_knowledge(bot_data["id"], file)
-    
+
     update_bot_data(bot_data)
     clear_bot_cache(bot_data["id"])
 

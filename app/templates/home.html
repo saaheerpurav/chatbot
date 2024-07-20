@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+
+    <link rel="stylesheet" href="{{url_for('static',filename='css/output.css')}}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+    <link rel="icon" href="https://www.saaheerpurav.com/favicon.ico" type="image/x-icon" sizes="any">
+
+    <script bot-id="f16155bd-temp" src="https://chatbot.saaheerpurav.com/embed"></script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="bg-[#0074f0]">
+        <div class="md:px-[15%] py-4 flex justify-between items-center text-white">
+            <div class="text-2xl font-bold whitespace-nowrap">AI Solutions</div>
+
+            <nav class="flex flex-row w-[100%] justify-between items-center pl-10">
+                <div>
+                    <a href="#features">Features</a>
+                    <a href="#how-it-works" class="ml-10">How it Works</a>
+                </div>
+
+                <a href="#contact"
+                    class="bg-white text-[#004fa3] py-2 px-4 rounded active:bg-gray-200 flex flex-row items-center w-min">
+                    <p class="font-semibold whitespace-nowrap">Contact Us</p>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+
+
+    <!-- Hero Section -->
+    <section class="bg-[#0074f0] text-white flex flex-row items-center justify-between h-[80vh] md:px-[15%]">
+        <div class="container py-16 w-[50%] text-left">
+
+            <h1 class="text-4xl md:text-7xl font-bold mb-10">Personalized AI Chatbots for your website</h1>
+
+            <p class="text-lg md:text-xl mb-8">We develop chatbots that engage your users and capture emails.</p>
+
+            <a href="#contact"
+                class="bg-white text-[#004fa3] py-4 px-6 rounded active:bg-gray-200 flex flex-row items-center w-min">
+                <p class="font-semibold mr-2 whitespace-nowrap">Get Started</p>
+                <svg class="-mr-1 h-5 w-5 -rotate-90" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                        clip-rule="evenodd" />
+                </svg>
+            </a>
+        </div>
+        <div class="w-[30%] h-[80%]">
+            <iframe src="/chatbot/iframe?id=f16155bd-temp" class="w-full h-full z-10"></iframe>
+        </div>
+    </section>
+
+
+
+    <!-- Features Section -->
+    <section class="pt-[10rem]" id="features">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-10 text-center text-black">What We Offer</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+
+                <!-- Feature 1 -->
+                <div
+                    class="bg-white border rounded-2xl shadow-sm p-6 text-center transition-all duration-200 hover:border-[#0074f0]">
+                    <div class="mb-6">
+                        <svg viewBox="0 0 24 24" fill="#0074f0" class="h-12 w-12 mx-auto">
+                            <path d="M12 1L9 9l-8 3 8 3 3 8 3-8 8-3-8-3-3-8z" />
+                        </svg>
+                    </div>
+
+                    <h3 class="text-xl font-semibold mb-2 text-black">Personalized Experience</h3>
+                    <p class="text-gray-600">
+                        Tailored chatbots that provide personalized UI and interactions for your users.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div
+                    class="bg-white border rounded-2xl shadow-sm p-6 text-center transition-all duration-200 hover:border-[#0074f0]">
+                    <div class="mb-6">
+                        <svg fill="none" stroke="#0074f0" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2" viewBox="0 0 24 24" class="h-12 w-12 mx-auto">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                            <path d="M22 6l-10 7L2 6" />
+                        </svg>
+                    </div>
+
+                    <h3 class="text-xl font-semibold mb-2 text-black">Email Capture</h3>
+                    <p class="text-gray-600">
+                        Effortlessly capture and manage emails from your chatbot interactions.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div
+                    class="bg-white border rounded-2xl shadow-sm p-6 text-center transition-all duration-200 hover:border-[#0074f0]">
+                    <div class="mb-6">
+                        <svg viewBox="0 0 24 24" fill="#0074f0" class="h-12 w-12 mx-auto">
+                            <path
+                                d="M16.5 11.74c0-.59-.07-1.16-.14-1.74h3.38c.08.33.15.67.19 1 .72.07 1.41.23 2.07.5C21.71 6.21 17.35 2 12 2 6.47 2 2 6.5 2 12s4.5 10 10 10c.87 0 1.71-.12 2.5-.33a6.599 6.599 0 01-1.46-3.47c-.31.61-.65 1.2-1.04 1.76-.83-1.2-1.5-2.53-1.91-3.96h3.09c.17-.72.46-1.39.85-2H9.66c-.1-.66-.16-1.32-.16-2s.06-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .5-.04 1-.1 1.5a6.36 6.36 0 012.1-1.76M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26m.82 2H8c.35 1.25.8 2.45 1.4 3.56A8.008 8.008 0 015.08 16M8 8H5.08A7.923 7.923 0 019.4 4.44C8.8 5.55 8.35 6.75 8 8m2.09 0c.41-1.43 1.08-2.77 1.91-3.97.83 1.2 1.5 2.54 1.91 3.97h-3.82m8.83 0h-2.95a15.65 15.65 0 00-1.38-3.56c1.84.63 3.37 1.9 4.33 3.56M23 17.5c0 .82-.25 1.58-.67 2.21l-1.09-1.09c.17-.34.26-.72.26-1.12A2.5 2.5 0 0019 15v1.5l-2.25-2.25L19 12v1.5c2.21 0 4 1.79 4 4m-4 1l2.25 2.25L19 23v-1.5c-2.21 0-4-1.79-4-4 0-.82.25-1.58.67-2.21l1.09 1.09c-.17.34-.26.72-.26 1.12A2.5 2.5 0 0019 20v-1.5z" />
+                        </svg>
+                    </div>
+
+                    <h3 class="text-xl font-semibold mb-2 text-black">Seamless Integration</h3>
+                    <p class="text-gray-600">
+                        Easily integrate your chatbot into any website or platform without
+                        disrupting workflows.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- How it works Section -->
+    <section class="pt-[10rem]" id="how-it-works">
+        <div class="container mx-auto px-4 text-center">
+
+            <h2 class="text-3xl font-semibold mb-10 text-black">How It Works</h2>
+
+            <div class="flex-row items-center justify-center relative mb-8 hidden md:flex">
+
+                <div class="border border-dashed border-spacing-2 border-gray-400 flex-1 h-0 w-[69%] absolute"></div>
+
+                <div class="w-full md:w-1/3 z-10 flex justify-center">
+                    <div class="bg-blue-50 w-10 h-10 flex items-center justify-center rounded-full">
+                        <p class="font-bold text-xl text-[#0074f0]">1</p>
+                    </div>
+                </div>
+
+
+                <div class="w-full md:w-1/3 z-10 flex justify-center">
+                    <div class="bg-blue-50 w-10 h-10 flex items-center justify-center rounded-full">
+                        <p class="font-bold text-xl text-[#0074f0]">2</p>
+                    </div>
+                </div>
+
+
+                <div class="w-full md:w-1/3 z-10 flex justify-center">
+                    <div class="bg-blue-50 w-10 h-10 flex items-center justify-center rounded-full">
+                        <p class="font-bold text-xl text-[#0074f0]">3</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-row flex-wrap items-center justify-between">
+
+                <div class="w-full md:w-1/3 mb-8">
+                    <div class="p-6 border shadow-sm rounded-lg">
+                        <h3 class="text-xl font-bold mb-4 text-blue-600">Add Knowledge</h3>
+                        <p>Upload knowledge files in .pdf, .docx, .txt or even raw text.</p>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/3 mb-8 md:px-5">
+                    <div class="p-6 border shadow-sm rounded-lg">
+                        <h3 class="text-xl font-bold mb-4 text-blue-600">Embed on your site</h3>
+                        <p>Integrate the chatbot into your platform seamlessly.</p>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/3 mb-8">
+                    <div class="p-6 border shadow-sm rounded-lg">
+                        <h3 class="text-xl font-bold mb-4 text-blue-600">Support</h3>
+                        <p>Receive ongoing support and updates from our team.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Features 2 Section -->
+    <section class="pt-[10rem]">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-semibold mb-10 text-black">24/7 Support & Easy Integration</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+                <div class="p-6 bg-white border rounded-2xl shadow-sm">
+
+                    <div class="bg-[#0074f0] w-min h-min p-3 rounded-2xl mb-8">
+                        <svg viewBox="0 0 24 24" fill="white" class="h-12 w-12">
+                            <path
+                                d="M12 2C6.486 2 2 6.486 2 12v4.143C2 17.167 2.897 18 4 18h1a1 1 0 001-1v-5.143a1 1 0 00-1-1h-.908C4.648 6.987 7.978 4 12 4s7.352 2.987 7.908 6.857H19a1 1 0 00-1 1V18c0 1.103-.897 2-2 2h-2v-1h-4v3h6c2.206 0 4-1.794 4-4 1.103 0 2-.833 2-1.857V12c0-5.514-4.486-10-10-10z" />
+                        </svg>
+                    </div>
+
+                    <h3 class="text-xl font-bold mb-4">24/7 Customer Support</h3>
+                    <p>Our chatbot provides round-the-clock assistance, ensuring your customers get the help they
+                        need, whenever they need it. No more missed queries or delayed responses!
+                    </p>
+                </div>
+
+                <div class="p-6 bg-white border rounded-2xl shadow-sm">
+                    <div class="bg-[#0074f0] w-min h-min p-3 rounded-2xl mb-8">
+                        <svg viewBox="0 0 16 16" fill="white" class="h-12 w-12">
+                            <path fill="white"
+                                d="M8 1c4.418 0 8 2.91 8 6.5S12.418 14 8 14c-.424 0-.841-.027-1.247-.079-1.718 1.718-3.77 2.027-5.753 2.072v-.421c1.071-.525 2-1.48 2-2.572a3.01 3.01 0 00-.034-.448C1.157 11.36 0 9.54 0 7.5 0 3.91 3.582 1 8 1z" />
+                        </svg>
+                    </div>
+
+                    <h3 class="text-xl font-bold mb-4">Easy Bubble Integration</h3>
+                    <p>Add our chatbot seamlessly to your website as an iframe or a bubble. It's easy to integrate and
+                        ensures a
+                        smooth, interactive experience for your users.
+                    </p>
+                </div>
+
+                <div class="p-6 bg-white border rounded-2xl shadow-sm">
+                    <div class="bg-[#0074f0] w-min h-min p-3 rounded-2xl mb-8">
+                        <svg viewBox="0 0 24 24" fill="white" class="h-12 w-12">
+                            <path
+                                d="M10 3H4a1 1 0 00-1 1v6a1 1 0 001 1h6a1 1 0 001-1V4a1 1 0 00-1-1zm10 0h-6a1 1 0 00-1 1v6a1 1 0 001 1h6a1 1 0 001-1V4a1 1 0 00-1-1zM10 13H4a1 1 0 00-1 1v6a1 1 0 001 1h6a1 1 0 001-1v-6a1 1 0 00-1-1zm8 1h-2v2h-2v2h2v2h2v-2h2v-2h-2z" />
+                        </svg>
+                    </div>
+
+                    <h3 class="text-xl font-bold mb-4">Customized UI</h3>
+                    <p>Have a chatbot designed specifically to your company's design and preferences. Get in touch with
+                        us to have your chatbot signify your brand first and foremost.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Contact Section -->
+    <section id="contact" class="container mx-auto px-4 mt-[10rem] flex flex-col items-center">
+        <h2 class="text-3xl font-bold mb-8 text-center">Contact Us</h2>
+        <p class="text-lg text-center">Ready to develop your personalized chatbot?</p>
+        <p class="text-lg text-center mb-8">
+            Get in touch with us at
+            <a href="mailto:saaheer.purav.business@gmail.com" target="_blank" class="text-blue-600">saaheer.purav.business@gmail.com</a>
+            or through the form below.
+        </p>
+
+        <div class="bg-white py-8 md:w-[50%]">
+            <form onsubmit="sendEmail(event)" id="contact-form" class="flex flex-col items-center">
+
+                <div class="mb-7 w-full">
+                    <input type="text" id="name" name="name" placeholder="Name"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0074f0]">
+                </div>
+
+                <div class="mb-7 w-full">
+                    <input type="email" id="email" name="email" placeholder="Email"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0074f0]">
+                </div>
+
+                <div class="mb-7 w-full">
+                    <textarea id="message" name="message" placeholder="How can we help you?"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0074f0]"></textarea>
+                </div>
+
+                <button type="submit"
+                    class="bg-[#0074f0] text-white px-4 py-2 w-min whitespace-nowrap rounded-full hover:bg-blue-700">
+                    Send
+                </button>
+            </form>
+        </div>
+    </section>
+
+
+
+    <!-- Footer -->
+    <footer class="bg-white text-gray-700 py-4">
+        <div class="container mx-auto px-4 text-center">
+            &copy; 2024 AI Solutions. All rights reserved.
+        </div>
+    </footer>
+
+</body>
+
+<script>
+    function sendEmail(e) {
+        e.preventDefault();
+
+        fetch("/contact", {
+                method: "POST",
+                body: new FormData(e.target),
+            })
+            .then((e) => {
+                if (e.ok) return e.json();
+                return e.text().then((r) => {
+                    throw new Error(r);
+                });
+            })
+            .then((e) => {
+                if (e.status === 200) {
+                    document.getElementById("contact-form").reset();
+                    alert("Message submitted. We'll get back to you as soon as possible.")
+                }
+            })
+            .catch((e) => {
+                console.log(e);
+            });
+    }
+</script>
+
+</html>

@@ -5,6 +5,7 @@ import os
 import s3fs
 import re
 import uuid
+import requests
 from .models import Users, Leads, db
 
 from llama_index.core import (
@@ -166,6 +167,31 @@ def upload_knowledge(bot_id, file):
 
 def clear_bot_cache(bot_id):
     del bot_cache["client_data"][bot_id]
-    
+
     if bot_id in bot_cache["contexts"]:
         del bot_cache["contexts"][bot_id]
+
+
+def send_email(data):
+    url = "https://api.useplunk.com/v1/send"
+    body = f"""
+        New Message Received!
+        Name: {data["name"]}
+        Email: {data["email"]}
+        Message: {data["message"]}
+    """
+
+    payload = {
+        "to": "saaheer.purav.business@gmail.com",
+        "subject": "Message from Contact Form",
+        "body": body,
+        "subscribed": True,
+        "name": "Contact Form",
+    }
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {os.environ.get("PLUNK_API_KEY")}"
+    }
+
+    response = requests.request("POST", url, json=payload, headers=headers)    
+    return json.loads(response.text)["success"]
