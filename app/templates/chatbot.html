@@ -118,9 +118,11 @@
 
         function convertToLinks(text) {
             const emailPattern = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
-            const urlPattern = /(https?:\/\/[^\s]+)/g;
+            const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+
             text = text.replace(emailPattern, '<a style="color: #0074f0" href="mailto:$1" target="_blank">$1</a>');
             text = text.replace(urlPattern, '<a style="color: #0074f0" href="$1" target="_blank">$1</a>');
+
             return text;
         }
 
